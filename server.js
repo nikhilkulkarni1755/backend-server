@@ -6,7 +6,8 @@ const { Expo } = require('expo-server-sdk');
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 
 // Initialize Expo SDK
@@ -41,9 +42,22 @@ app.post('/send-notification', async (req, res) => {
   try {
     const { color, message, title, text } = req.body;
 
-    // Use provided message/text, or construct from color
+    // Build notification body from any provided field
+    let notificationBody = message || text || color;
+
+    // If no message provided, use first non-title, non-color field
+    if (!notificationBody) {
+      const fields = Object.entries(req.body).filter(
+        ([key, val]) => key !== 'title' && typeof val === 'string'
+      );
+      if (fields.length > 0) {
+        notificationBody = fields[0][1];
+      } else {
+        notificationBody = 'Event triggered';
+      }
+    }
+
     let notificationTitle = title || 'Notification';
-    let notificationBody = message || text || color || 'Event triggered';
 
     console.log(`📬 Sending notification: "${notificationTitle}" - "${notificationBody}"`);
     console.log(`👥 Devices to notify: ${deviceTokens.size}`);
