@@ -5,8 +5,8 @@ const { Expo } = require('expo-server-sdk');
 
 const app = express();
 
-// API Key for securing endpoints
-const API_KEY = process.env.NOTIFICATION_API_KEY || 'dev-api-key-change-in-production';
+// API Key for securing endpointe
+const API_KEY = process.env.NOTIFICATION_API_KEY || 'random key you should change';
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
